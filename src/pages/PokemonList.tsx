@@ -208,26 +208,22 @@ const PokemonList = () => {
 
   return (
     <div className="p-4">
-      <div className="flex flex-wrap gap-2 mb-4 relative w-full sm:justify-end">
+      <div className="mb-4 relative w-full">
         <form
           onSubmit={handleSearch}
-          className="flex items-center gap-2 mb-4 relative w-full"
+          className="flex items-center gap-2 w-full relative"
         >
           <input
             type="text"
-            placeholder=" Pokemon name or ID"
+            placeholder="Pokemon name or ID"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="
-      input input-bordered
-      h-10 text-lg
-      flex-1
-    "
+            className="input input-bordered h-10 text-lg flex-1 min-w-0"
           />
 
           <button
             type="submit"
-            className="btn btn-primary h-10"
+            className="btn btn-primary h-10 shrink-0"
             disabled={!searchValue.trim()}
           >
             Search
@@ -237,7 +233,7 @@ const PokemonList = () => {
             type="button"
             ref={filterButtonRef}
             onClick={() => setShowFilters((v) => !v)}
-            className="btn btn-neutral h-10 relative"
+            className="btn btn-neutral h-10 shrink-0 relative"
           >
             Filters
             {hasActiveFilter && (
@@ -250,53 +246,46 @@ const PokemonList = () => {
               ref={filterBoxRef}
               className="absolute right-0 top-12 w-64 rounded-lg p-4 bg-surface shadow-lg z-20"
             >
-              {showFilters && (
-                <div
-                  ref={filterBoxRef}
-                  className="absolute right-0 top-12 w-64 rounded-lg p-4 bg-surface shadow-lg z-20"
-                >
-                  {(['all', 'type', 'habitat'] as FilterType[]).map((f) => (
-                    <label key={f} className="flex flex-col gap-2 mb-3 text-sm">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          checked={draftFilterType === f}
-                          onChange={() => {
-                            setDraftFilterType(f);
-                            setDraftFilterValue('');
-                          }}
-                        />
-                        <span className="capitalize">
-                          {f === 'all' ? 'All Pokémon' : f}
-                        </span>
-                      </div>
+              {(['all', 'type', 'habitat'] as FilterType[]).map((f) => (
+                <label key={f} className="flex flex-col gap-2 mb-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      checked={draftFilterType === f}
+                      onChange={() => {
+                        setDraftFilterType(f);
+                        setDraftFilterValue('');
+                      }}
+                    />
+                    <span className="capitalize">
+                      {f === 'all' ? 'All Pokémon' : f}
+                    </span>
+                  </div>
 
-                      {draftFilterType === f && f !== 'all' && (
-                        <select
-                          value={draftFilterValue}
-                          onChange={(e) => setDraftFilterValue(e.target.value)}
-                          className="mt-1 rounded px-2 py-1 border"
-                        >
-                          <option value="">Select {f}</option>
-                          {FILTER_OPTIONS[f].map((opt) => (
-                            <option key={opt} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                    </label>
-                  ))}
+                  {draftFilterType === f && f !== 'all' && (
+                    <select
+                      value={draftFilterValue}
+                      onChange={(e) => setDraftFilterValue(e.target.value)}
+                      className="mt-1 rounded px-2 py-1 border"
+                    >
+                      <option value="">Select {f}</option>
+                      {FILTER_OPTIONS[f].map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </label>
+              ))}
 
-                  <button
-                    disabled={draftFilterType !== 'all' && !draftFilterValue}
-                    onClick={applyFilter}
-                    className="btn btn-primary w-full mt-2"
-                  >
-                    Apply filter
-                  </button>
-                </div>
-              )}
+              <button
+                disabled={draftFilterType !== 'all' && !draftFilterValue}
+                onClick={applyFilter}
+                className="btn btn-primary w-full mt-2"
+              >
+                Apply filter
+              </button>
             </div>
           )}
         </form>
