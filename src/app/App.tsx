@@ -5,6 +5,7 @@ import PokemonList from '../pages/PokemonList';
 import PokemonDetail from '../pages/PokemonDetail';
 import Favorites from '../pages/Favorites';
 import NotFound from '../pages/NotFound';
+import PokemonNotFound from '../pages/PokemonNotFound';
 
 const App = () => {
   return (
@@ -18,6 +19,10 @@ const App = () => {
             <Route path="/pokemon/:id" element={<PokemonDetail />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="*" element={<NotFound />} />
+            <Route
+              path="/pokemon-not-found/:id"
+              element={<PokemonNotFound />}
+            />
           </Routes>
         </main>
       </div>

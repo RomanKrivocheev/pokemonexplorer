@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 import { getPokemonDetails, type PokemonDetails } from '../services/pokemonApi';
 import Loader from '../components/Loader';
@@ -11,6 +12,7 @@ const MAX_STAT = 255;
 
 const PokemonDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const { favorites, toggleFavorite } = useFavorites();
 
@@ -25,6 +27,8 @@ const PokemonDetail = () => {
       try {
         const data = await getPokemonDetails(id);
         setPokemon(data);
+      } catch {
+        navigate(`/pokemon-not-found/${id}`);
       } finally {
         setLoading(false);
       }
