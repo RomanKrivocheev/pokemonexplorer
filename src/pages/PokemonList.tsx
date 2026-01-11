@@ -1,15 +1,52 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../app/ThemeProvider';
+import Loader from '../components/Loader';
 
 import {
   getPokemonPage,
   getPokemonDetails,
+  getPokemonByType,
+  getPokemonByHabitat,
   type PokemonDetails,
 } from '../services/pokemonApi';
-import Loader from '../components/Loader';
 
 const LIMIT = 20;
+
+type FilterType = 'all' | 'type' | 'habitat';
+
+const FILTER_OPTIONS = {
+  type: [
+    'normal',
+    'fire',
+    'water',
+    'electric',
+    'grass',
+    'ice',
+    'fighting',
+    'poison',
+    'ground',
+    'flying',
+    'psychic',
+    'bug',
+    'rock',
+    'ghost',
+    'dragon',
+    'dark',
+    'steel',
+    'fairy',
+  ],
+  habitat: [
+    'grassland',
+    'forest',
+    'waters-edge',
+    'cave',
+    'mountain',
+    'rough-terrain',
+    'urban',
+    'rare',
+  ],
+};
 
 const TYPE_COLORS: Record<string, string> = {
   normal: 'bg-gray-400 text-white',
@@ -36,12 +73,38 @@ const PokemonList = () => {
   const [pokemon, setPokemon] = useState<PokemonDetails[]>([]);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+
+  const [filterType, setFilterType] = useState<FilterType>('all');
+
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const [draftFilterType, setDraftFilterType] = useState<FilterType>('all');
+  const [draftFilterValue, setDraftFilterValue] = useState('');
+
+  const [showFilters, setShowFilters] = useState(false);
+
+  const filterBoxRef = useRef<HTMLDivElement | null>(null);
+  const filterButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const { theme } = useTheme();
 
+  const hasActiveFilter = filterType !== 'all';
+
   useEffect(() => {
+    if (filterType !== 'all') return;
+
     const load = async () => {
       setLoading(true);
       try {
@@ -49,17 +112,37 @@ const PokemonList = () => {
         const details = await Promise.all(
           page.results.map((p) => getPokemonDetails(p.name))
         );
-        setPokemon((prev) => [...prev, ...details]);
+        setPokemon((prev) => (offset === 0 ? details : [...prev, ...details]));
       } finally {
         setLoading(false);
       }
     };
 
     load();
-  }, [offset]);
+  }, [offset, filterType]);
 
   useEffect(() => {
-    if (!loaderRef.current) return;
+    if (!showFilters) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (
+        filterBoxRef.current?.contains(target) ||
+        filterButtonRef.current?.contains(target)
+      ) {
+        return;
+      }
+
+      setShowFilters(false);
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showFilters]);
+
+  useEffect(() => {
+    if (!loaderRef.current || filterType !== 'all') return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -72,10 +155,144 @@ const PokemonList = () => {
 
     observer.observe(loaderRef.current);
     return () => observer.disconnect();
-  }, [loading]);
+  }, [loading, filterType]);
+
+  const applyFilter = async () => {
+    setShowFilters(false);
+    setLoading(true);
+
+    setFilterType(draftFilterType);
+
+    setPokemon([]);
+    setOffset(0);
+
+    try {
+      if (draftFilterType === 'all') {
+        return;
+      }
+
+      let list: { name: string }[] = [];
+
+      if (draftFilterType === 'type')
+        list = await getPokemonByType(draftFilterValue);
+
+      if (draftFilterType === 'habitat')
+        list = await getPokemonByHabitat(draftFilterValue);
+
+      const results = await Promise.allSettled(
+        list.map((p) => getPokemonDetails(p.name))
+      );
+
+      const successful = results
+        .filter(
+          (r): r is PromiseFulfilledResult<PokemonDetails> =>
+            r.status === 'fulfilled'
+        )
+        .map((r) => r.value);
+
+      setPokemon(successful);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const value = searchValue.trim().toLowerCase();
+    if (!value) return;
+
+    navigate(`/pokemon/${value}`);
+    setSearchValue('');
+  };
 
   return (
     <div className="p-4">
+      <div className="flex justify-end items-center gap-2 mb-4 relative">
+        <form onSubmit={handleSearch} className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Name or #"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="
+            input input-bordered input-sm
+            h-8
+            w-32 sm:w-40
+            text-base
+          "
+          />
+          <button
+            type="submit"
+            className="btn btn-primary btn-sm"
+            disabled={!searchValue.trim()}
+          >
+            Search
+          </button>
+        </form>
+
+        {/* Filters */}
+        <button
+          ref={filterButtonRef}
+          onClick={() => setShowFilters((v) => !v)}
+          className="btn btn-neutral relative"
+        >
+          Filters
+          {hasActiveFilter && (
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
+          )}
+        </button>
+
+        {showFilters && (
+          <div
+            ref={filterBoxRef}
+            className="absolute right-0 top-12 w-64 rounded-lg p-4 bg-surface shadow-lg z-20"
+          >
+            {(['all', 'type', 'habitat'] as FilterType[]).map((f) => (
+              <label key={f} className="flex flex-col gap-2 mb-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    checked={draftFilterType === f}
+                    onChange={() => {
+                      setDraftFilterType(f);
+                      setDraftFilterValue('');
+                    }}
+                  />
+                  <span className="capitalize">
+                    {f === 'all' ? 'All Pokémon' : f}
+                  </span>
+                </div>
+
+                {draftFilterType === f && f !== 'all' && (
+                  <select
+                    value={draftFilterValue}
+                    onChange={(e) => setDraftFilterValue(e.target.value)}
+                    className="mt-1 rounded px-2 py-1 border"
+                  >
+                    <option value="">Select {f}</option>
+                    {FILTER_OPTIONS[f].map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </label>
+            ))}
+
+            <button
+              disabled={draftFilterType !== 'all' && !draftFilterValue}
+              onClick={applyFilter}
+              className="btn btn-primary w-full mt-2"
+            >
+              Apply filter
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* GRID */}
       <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {pokemon.map((p) => (
           <li
@@ -83,8 +300,7 @@ const PokemonList = () => {
             onClick={() => navigate(`/pokemon/${p.id}`)}
             title="Click to see more details"
             className={[
-              'group cursor-pointer rounded-lg p-3',
-              'transition-all hover:-translate-y-1',
+              'cursor-pointer rounded-lg p-3 transition-all hover:-translate-y-1',
               theme === 'dark'
                 ? 'shadow-md shadow-white/20 hover:shadow-lg hover:shadow-white/30'
                 : 'shadow-md shadow-black/20 hover:shadow-lg hover:shadow-black/30',
@@ -104,10 +320,9 @@ const PokemonList = () => {
                 {p.types.map((t) => (
                   <span
                     key={t.type.name}
-                    className={`
-                    text3 capitalize px-2 py-0.5 rounded
-                    ${TYPE_COLORS[t.type.name] ?? 'bg-gray-300 text-black'}
-                  `}
+                    className={`text3 px-2 py-0.5 rounded capitalize ${
+                      TYPE_COLORS[t.type.name]
+                    }`}
                   >
                     {t.type.name}
                   </span>
@@ -118,9 +333,25 @@ const PokemonList = () => {
         ))}
       </ul>
 
-      {/* Infinite scroll trigger */}
-      <div ref={loaderRef} className="h-12" />
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Scroll to top"
+          title="Scroll to top"
+          className={[
+            'fixed bottom-6 right-6 z-50 cursor-pointer',
+            'w-12 h-12 rounded-full',
+            'flex items-center justify-center',
+            'transition-all duration-300',
+            'shadow-lg hover:scale-110',
+            'bg-primary text-white',
+          ].join(' ')}
+        >
+          ↑
+        </button>
+      )}
 
+      {filterType === 'all' && <div ref={loaderRef} className="h-12" />}
       {loading && <Loader />}
     </div>
   );

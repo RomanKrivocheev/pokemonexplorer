@@ -87,44 +87,19 @@ export const getPokemonByType = async (type: string) => {
   }
 };
 
-export const getPokemonByGeneration = async (gen: string) => {
-  try {
-    const res = await fetch(`${API_BASE}/generation/${gen}`);
-    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+export async function getPokemonByHabitat(habitat: string) {
+  const res = await fetch(
+    `https://pokeapi.co/api/v2/pokemon-habitat/${habitat}`
+  );
 
-    const data = await res.json();
-    return data.pokemon_species;
-  } catch (error) {
-    console.error('Failed to fetch Pokémon by generation', error);
-    throw error;
-  }
-};
+  if (!res.ok) throw new Error('Failed to fetch habitat');
 
-export const getPokemonByHabitat = async (habitat: string) => {
-  try {
-    const res = await fetch(`${API_BASE}/pokemon-habitat/${habitat}`);
-    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+  const data = await res.json();
 
-    const data = await res.json();
-    return data.pokemon_species;
-  } catch (error) {
-    console.error('Failed to fetch Pokémon by habitat', error);
-    throw error;
-  }
-};
-
-export const getPokemonByColor = async (color: string) => {
-  try {
-    const res = await fetch(`${API_BASE}/pokemon-color/${color}`);
-    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-
-    const data = await res.json();
-    return data.pokemon_species;
-  } catch (error) {
-    console.error('Failed to fetch Pokémon by color', error);
-    throw error;
-  }
-};
+  return data.pokemon_species.map((s: any) => ({
+    name: s.name,
+  }));
+}
 
 export const getPokemonDetails = async (
   nameOrId: string | number

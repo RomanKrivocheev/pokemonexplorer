@@ -4,6 +4,7 @@ import { FavoritesProvider } from './FavoritesProvider';
 import PokemonList from '../pages/PokemonList';
 import PokemonDetail from '../pages/PokemonDetail';
 import Favorites from '../pages/Favorites';
+import NotFound from '../pages/NotFound';
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
             <Route path="/" element={<PokemonList />} />
             <Route path="/pokemon/:id" element={<PokemonDetail />} />
             <Route path="/favorites" element={<Favorites />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
       </div>

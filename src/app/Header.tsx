@@ -27,7 +27,6 @@ const Header = () => {
         bg-[rgb(var(--bg))]
       "
     >
-      {/* Left: Logo */}
       <div className="flex items-center gap-3 select-none">
         <svg
           onClick={() => navigate('/')}
@@ -60,12 +59,11 @@ const Header = () => {
       </div>
 
       <div className="text-center">
-        <span className="h1 hidden sm:block font-bold tracking-wide">
+        <span className="h1 cursor-default hidden sm:block font-bold tracking-wide">
           {pageTitle}
         </span>
       </div>
 
-      {/* Right: Nav + Theme */}
       <div className="flex items-center gap-6">
         <nav className="flex gap-6">
           <NavLink
@@ -116,7 +114,6 @@ const Header = () => {
           </NavLink>
         </nav>
 
-        {/* Theme toggle */}
         <button
           onClick={toggleTheme}
           className="btn btn-neutral flex items-center gap-2"

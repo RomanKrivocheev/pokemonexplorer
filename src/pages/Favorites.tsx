@@ -10,6 +10,8 @@ const Favorites = () => {
   const { theme } = useTheme();
   const [pokemon, setPokemon] = useState<PokemonDetails[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,12 +35,18 @@ const Favorites = () => {
     load();
   }, [favorites]);
 
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   if (loading) return <Loader />;
 
   return (
-    <div className="p-4">
+    <div className="p-4 relative">
       {pokemon.length === 0 ? (
-        <p className="opacity-70">No favorite Pokémon yet.</p>
+        <p className="opacity-70">No favorite Pokemons yet</p>
       ) : (
         <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {pokemon.map((p) => (
@@ -67,6 +75,24 @@ const Favorites = () => {
             </li>
           ))}
         </ul>
+      )}
+
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Scroll to top"
+          title="Scroll to top"
+          className="
+            fixed bottom-6 right-6 z-50 cursor-pointer
+            w-12 h-12 rounded-full
+            flex items-center justify-center
+            bg-primary text-white
+            shadow-lg hover:scale-110
+            transition-all
+          "
+        >
+          ↑
+        </button>
       )}
     </div>
   );
