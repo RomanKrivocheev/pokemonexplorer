@@ -1,37 +1,33 @@
-/* Pokémon-like typography (free & safe) */
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 
-/* ---------- Design Tokens ---------- */
 :root {
-  /* Typography */
   font-family: Rubik, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
 
-  /* Light theme (classic Pokémon) */
+  /* Light theme */
   --bg: 255 255 255;
   --text: 0 0 0;
 
-  --primary: 220 38 38; /* red */
-  --secondary: 59 130 246; /* Pokémon light blue */
-
-  --on-primary: 255 255 255;
-  --on-secondary: 255 255 255; /* white text on blue */
-}
-
-.dark {
-  /* Dark theme (mystic Pokémon) */
-  --bg: 17 24 39; /* deep indigo */
-  --text: 255 255 255;
-
-  --primary: 139 92 246; /* purple */
-  --secondary: 236 72 153; /* pink */
+  --primary: 220 38 38;
+  --secondary: 59 130 246;
 
   --on-primary: 255 255 255;
   --on-secondary: 255 255 255;
 }
 
-/* ---------- Base ---------- */
+.dark {
+  /* Dark theme*/
+  --bg: 17 24 39;
+  --text: 255 255 255;
+
+  --primary: 139 92 246;
+  --secondary: 236 72 153;
+
+  --on-primary: 255 255 255;
+  --on-secondary: 255 255 255;
+}
+
 html,
 body,
 #root {
@@ -43,7 +39,6 @@ body {
   color: rgb(var(--text));
 }
 
-/* ---------- Semantic Tailwind utilities ---------- */
 @layer utilities {
   .bg-primary {
     background-color: rgb(var(--primary));
@@ -78,7 +73,6 @@ body {
   }
 }
 
-/* ---------- Buttons ---------- */
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center rounded-md px-4 py-2 font-medium
@@ -86,7 +80,6 @@ body {
       focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
       cursor-pointer;
 
-    /* Base elevation */
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
@@ -99,19 +92,16 @@ body {
     box-shadow: 0 8px 16px rgba(255, 255, 255, 0.25);
   }
 
-  /* ---- Primary ---- */
   .btn-primary {
     background-color: rgb(var(--primary));
     color: rgb(var(--on-primary));
   }
 
-  /* ---- Secondary ---- */
   .btn-secondary {
     background-color: rgb(var(--secondary));
     color: rgb(var(--on-secondary));
   }
 
-  /* ---- Neutral ---- */
   .btn-neutral {
     background-color: rgb(var(--bg));
     color: rgb(var(--text));
@@ -123,9 +113,7 @@ body {
   }
 }
 
-/* ---------- Typography ---------- */
 @layer components {
-  /* Headings */
   .h1 {
     @apply font-bold tracking-wide text-3xl sm:text-4xl md:text-5xl;
   }
@@ -134,7 +122,6 @@ body {
     @apply font-semibold tracking-wide text-2xl sm:text-3xl md:text-4xl;
   }
 
-  /* Text */
   .text1 {
     @apply text-base sm:text-lg;
   }
@@ -145,5 +132,45 @@ body {
 
   .text3 {
     @apply text-xs sm:text-sm opacity-80;
+  }
+}
+
+@layer utilities {
+  .nav-hover {
+    @apply transition-all duration-300;
+  }
+
+  .card-outline {
+    @apply border border-black/20 dark:border-white/30;
+  }
+
+  .card-shadow {
+    @apply shadow-sm hover:shadow-xl transition-all;
+  }
+
+  .card-hover-shadow {
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .card-hover-shadow:hover {
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-4px);
+  }
+
+  .nav-hover:hover {
+    text-shadow: 0 0 8px rgb(var(--primary));
+  }
+
+  @keyframes poke-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-pokeball {
+    animation: poke-spin 1.2s linear infinite;
   }
 }

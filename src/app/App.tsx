@@ -1,29 +1,25 @@
-import { useTheme } from './ThemeProvider';
+import { Routes, Route } from 'react-router-dom';
+import Header from './Header';
+import { FavoritesProvider } from './FavoritesProvider';
+import PokemonList from '../pages/PokemonList';
+import PokemonDetail from '../pages/PokemonDetail';
+import Favorites from '../pages/Favorites';
 
 const App = () => {
-  const { theme, toggleTheme } = useTheme();
-
   return (
-    <div className="min-h-screen bg-surface text-base flex flex-col items-center justify-center gap-6">
-      <h1 className="h1">Pokémon Explorer</h1>
-      <div className="flex gap-4">
-        <button className="btn btn-primary">Primary</button>
-        <button className="btn btn-secondary">Secondary</button>
-        <button className="btn btn-neutral">Neutral</button>
+    <FavoritesProvider>
+      <div className="min-h-screen flex flex-col bg-surface text-base">
+        <Header />
+
+        <main className="flex-1 overflow-auto">
+          <Routes>
+            <Route path="/" element={<PokemonList />} />
+            <Route path="/pokemon/:id" element={<PokemonDetail />} />
+            <Route path="/favorites" element={<Favorites />} />
+          </Routes>
+        </main>
       </div>
-
-      <button onClick={toggleTheme} className="btn btn-neutral">
-        Toggle theme (currently {theme})
-      </button>
-
-      <p className="text1">
-        Explore Pokémon, mark your favorites, and view details.
-      </p>
-
-      <p className="text2">Data provided by the PokéAPI.</p>
-
-      <p className="text3">© Pokémon Explorer</p>
-    </div>
+    </FavoritesProvider>
   );
 };
 
