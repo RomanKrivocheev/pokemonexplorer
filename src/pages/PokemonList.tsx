@@ -208,7 +208,7 @@ const PokemonList = () => {
 
   return (
     <div className="p-4">
-      <div className="mb-4 relative w-full">
+      <div className="mb-4 relative w-full pb-4">
         <form
           onSubmit={handleSearch}
           className="flex items-center gap-2 w-full relative"
@@ -218,7 +218,7 @@ const PokemonList = () => {
             placeholder="Pokemon name or ID"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="input input-bordered h-10 text-lg flex-1 min-w-0"
+            className="input h-10 text-lg flex-1 min-w-0 border p-2 rounded-full border-gray-300"
           />
 
           <button
