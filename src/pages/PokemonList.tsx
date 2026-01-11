@@ -215,7 +215,7 @@ const PokemonList = () => {
         >
           <input
             type="text"
-            placeholder="Pokemon name or ID"
+            placeholder="Name or number"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             className="input h-10 text-lg flex-1 min-w-0 border p-2 rounded-full border-gray-300"
