@@ -208,19 +208,17 @@ const PokemonList = () => {
 
   return (
     <div className="p-4">
-      <div className="flex justify-end items-center gap-2 mb-4 relative">
+      <div className="flex flex-wrap gap-2 mb-4 relative w-full sm:justify-end">
         <form onSubmit={handleSearch} className="flex items-center gap-2">
           <input
             type="text"
-            placeholder="Name or #"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            placeholder="Search Pokémon"
             className="
-            input input-bordered input-sm
-            h-8
-            w-32 sm:w-40
-            text-base
-          "
+    input input-bordered
+    h-10 text-lg
+    w-full sm:w-56
+    flex-1
+  "
           />
           <button
             type="submit"
@@ -231,7 +229,6 @@ const PokemonList = () => {
           </button>
         </form>
 
-        {/* Filters */}
         <button
           ref={filterButtonRef}
           onClick={() => setShowFilters((v) => !v)}
@@ -292,7 +289,6 @@ const PokemonList = () => {
         )}
       </div>
 
-      {/* GRID */}
       <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {pokemon.map((p) => (
           <li
