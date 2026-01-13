@@ -10,6 +10,7 @@ import {
   getPokemonByHabitat,
   type PokemonDetails,
 } from '../services/pokemonApi';
+import PokemonCardImage from '../components/PokemonCardImage';
 
 const LIMIT = 20;
 
@@ -304,11 +305,15 @@ const PokemonList = () => {
                 : 'shadow-md shadow-black/20 hover:shadow-lg hover:shadow-black/30',
             ].join(' ')}
           >
-            <img
+            <PokemonCardImage
+              src={p.sprites.other?.['official-artwork']?.front_default ?? ''}
+              alt={p.name}
+            />
+            {/* <img
               src={p.sprites.other?.['official-artwork']?.front_default ?? ''}
               alt={p.name}
               className="w-24 h-24 mx-auto"
-            />
+            /> */}
 
             <div className="mt-2 text-center">
               <p className="text3 opacity-70">#{p.id}</p>
